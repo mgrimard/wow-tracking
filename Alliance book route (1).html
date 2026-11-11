@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alliance book route</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,500;0,700;1,400;1,500&family=Alegreya+Sans:wght@400;500;700&display=swap">
+<style>
+@property --p { syntax: "<number>"; inherits: false; initial-value: 0; }
+
+:root {
+  color-scheme: light;
+  --paper: #eef1f6;
+  --hover: #e2e8f1;
+  --ink: #17223a;
+  --ink-soft: #51607c;
+  --lapis: #2b4e92;
+  --lapis-line: #a9badb;
+  --on-lapis: #ffffff;
+  --gilt: #d4a544;
+  --gilt-edge: #96711e;
+  --gilt-ink: #7a5a12;
+  --rule: #c7d0de;
+  --crimson: #a3374a;
+  --crimson-line: #dcb0b8;
+  --serif: "Alegreya", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: "Alegreya Sans", "Gill Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.6 8.4l2.9 2.9 5.9-6.6' fill='none' stroke='%2317223a' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #0d1525;
+    --hover: #152037;
+    --ink: #e8ecf3;
+    --ink-soft: #a0acc2;
+    --lapis: #93b4f2;
+    --lapis-line: #3a5486;
+    --on-lapis: #0d1525;
+    --gilt: #e1b85a;
+    --gilt-edge: #e1b85a;
+    --gilt-ink: #ecc97b;
+    --rule: #28364f;
+    --crimson: #f0909c;
+    --crimson-line: #6a3242;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0d1525;
+  --hover: #152037;
+  --ink: #e8ecf3;
+  --ink-soft: #a0acc2;
+  --lapis: #93b4f2;
+  --lapis-line: #3a5486;
+  --on-lapis: #0d1525;
+  --gilt: #e1b85a;
+  --gilt-edge: #e1b85a;
+  --gilt-ink: #ecc97b;
+  --rule: #28364f;
+  --crimson: #f0909c;
+  --crimson-line: #6a3242;
+}
+
+*, *::before, *::after { box-sizing: inherit; }
+html {
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 10;
+  background: var(--paper);
+}
+:focus-visible { outline: 3px solid var(--lapis); outline-offset: 2px; }
+.sr {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
+.wrap { width: 100%; max-width: 44rem; margin-inline: auto; padding-inline: 1.25rem; }
+
+/* Masthead */
+.masthead { padding-top: 2.75rem; padding-bottom: 1.25rem; }
+.masthead h1 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(2.25rem, 8vw, 3.375rem);
+  line-height: 1;
+  letter-spacing: -0.015em;
+  margin: 0 0 .7rem;
+}
+.lede { margin: 0; max-width: 33rem; color: var(--ink-soft); font-size: 1.125rem; line-height: 1.45; }
+.sync { margin: .8rem 0 0; font-size: .875rem; color: var(--ink-soft); min-height: 1.3em; }
+.sync[data-mode="synced"] { color: var(--gilt-ink); }
+
+/* Sticky toolbar */
+.toolbar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 5;
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+}
+.toolbar-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "tally hide" "jumps jumps";
+  gap: .6rem 1rem;
+  align-items: center;
+  padding-top: .75rem;
+  padding-bottom: .65rem;
+}
+.tally { grid-area: tally; min-width: 0; }
+.tally-text { margin: 0 0 .35rem; font-size: .9375rem; }
+.tally-text strong { font-weight: 700; font-variant-numeric: tabular-nums; }
+.bar { height: .375rem; max-width: 16rem; background: var(--rule); border-radius: 1rem; overflow: hidden; }
+.bar span { display: block; height: 100%; width: 0; background: var(--gilt); transition: width .4s ease; }
+
+.hide-toggle, .jump, .clear {
+  font: inherit;
+  font-size: .875rem;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: .375rem;
+  cursor: pointer;
+}
+.hide-toggle { grid-area: hide; padding: .4rem .75rem; }
+.hide-toggle[aria-pressed="true"] { background: var(--lapis); border-color: var(--lapis); color: var(--on-lapis); }
+
+.jumps {
+  grid-area: jumps;
+  display: flex;
+  gap: .4rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-inline: -1.25rem;
+  padding: .1rem 1.25rem .15rem;
+}
+.jumps::-webkit-scrollbar { display: none; }
+.jump { flex: none; display: inline-flex; align-items: baseline; gap: .45rem; padding: .3rem .65rem; }
+.jump .jc { color: var(--ink-soft); font-variant-numeric: tabular-nums; font-size: .8125rem; }
+.jump.is-done { border-color: var(--gilt-edge); }
+.jump.is-done .jc { color: var(--gilt-ink); }
+.hide-toggle:hover, .jump:hover, .clear:hover { border-color: var(--lapis-line); }
+
+/* Route */
+.route {
+  --spine: .8rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+.route::before {
+  content: "";
+  position: absolute;
+  top: 2.6rem;
+  bottom: .75rem;
+  left: calc(var(--spine) - 1.5px);
+  width: 3px;
+  border-radius: 2px;
+  background: var(--rule);
+}
+.bracket {
+  padding: 2.25rem 0 .25rem;
+  scroll-margin-top: calc(var(--toolbar-h, 7rem) + .25rem);
+}
+.bracket-head {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: .75rem;
+  padding-left: 2.4rem;
+}
+.ribbon {
+  position: absolute;
+  left: calc(var(--spine) - .5rem);
+  top: .3rem;
+  width: 1rem;
+  height: 1.35rem;
+  background: var(--lapis);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%);
+  transition: background-color .3s ease;
+}
+.bracket.is-done .ribbon { background: var(--gilt); }
+.bracket-head h2 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 1.625rem;
+  line-height: 1.15;
+  margin: 0;
+}
+.bracket-head h2:focus:not(:focus-visible) { outline: none; }
+.bracket-count {
+  margin-left: auto;
+  font-size: .9375rem;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.bracket.is-done .bracket-count { color: var(--gilt-ink); }
+.tip {
+  margin: .4rem 0 0 2.4rem;
+  max-width: 34rem;
+  color: var(--ink-soft);
+  font-size: .9375rem;
+  line-height: 1.45;
+}
+
+.zones { list-style: none; margin: .9rem 0 0; padding: 0; }
+.zone { position: relative; padding: .55rem 0 .45rem 2.4rem; }
+.node {
+  --p: 0;
+  position: absolute;
+  left: calc(var(--spine) - .5625rem);
+  top: .9rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  border: 2px solid var(--rule);
+  background: conic-gradient(var(--gilt) calc(var(--p) * 360deg), var(--paper) 0);
+  transition: --p .45s ease, border-color .3s ease;
+}
+.zone.has-some .node { border-color: var(--gilt-edge); }
+.zone.is-done .node::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--check) center / 78% no-repeat;
+}
+.zone-head {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .1rem .6rem;
+  font-weight: 400;
+}
+.zone-name { font-family: var(--serif); font-weight: 500; font-size: 1.1875rem; line-height: 1.3; }
+.zone-lv { font-size: .875rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.zone-flag { font-size: .8125rem; color: var(--crimson); }
+.zone-note { display: none; margin: .1rem 0 0; font-size: .875rem; color: var(--gilt-ink); }
+.zone.is-collapsed .zone-note { display: block; }
+
+.books { list-style: none; margin: .3rem 0 0; padding: 0; }
+.book {
+  display: grid;
+  grid-template-columns: 1.375rem minmax(0, 1fr);
+  column-gap: .75rem;
+  padding: .45rem .6rem .5rem;
+  margin-left: -.6rem;
+  border-radius: .375rem;
+  cursor: pointer;
+}
+.book:hover, .book:focus-within { background: var(--hover); }
+.tick {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.3rem;
+  height: 1.3rem;
+  margin: .15rem 0 0;
+  border: 2px solid var(--ink-soft);
+  border-radius: .3rem;
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease;
+}
+.tick:checked { background: var(--gilt) var(--check) center / 100% no-repeat; border-color: var(--gilt-edge); }
+.book-body { display: block; min-width: 0; }
+.book-title {
+  display: block;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.125rem;
+  line-height: 1.3;
+  text-decoration: line-through;
+  text-decoration-color: transparent;
+  text-decoration-thickness: .08em;
+  transition: color .2s ease, text-decoration-color .2s ease;
+}
+.book.is-done .book-title { color: var(--ink-soft); text-decoration-color: var(--gilt-edge); }
+.book-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .35rem .5rem;
+  margin-top: .3rem;
+}
+.tags { display: flex; flex-wrap: wrap; gap: .3rem; }
+.tag {
+  display: inline-block;
+  font-size: .8125rem;
+  line-height: 1.45;
+  padding: 0 .45rem;
+  border: 1px solid var(--rule);
+  border-radius: .25rem;
+  color: var(--ink-soft);
+}
+.tag-group { color: var(--lapis); border-color: var(--lapis-line); }
+.tag-hard { color: var(--crimson); border-color: var(--crimson-line); }
+.tag-missing { border-style: dashed; border-color: var(--ink-soft); }
+.watch {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .15rem .1rem;
+  font-size: .875rem;
+  font-weight: 500;
+  color: var(--lapis);
+  text-decoration: none;
+  border-radius: .25rem;
+}
+.watch:hover { text-decoration: underline; text-underline-offset: .18em; }
+.watch svg { width: .7rem; height: .7rem; fill: currentColor; flex: none; }
+
+/* Tabs */
+.tabs { display: flex; gap: .25rem; border-bottom: 1px solid var(--rule); }
+.tab {
+  font: inherit; font-size: 1rem; font-weight: 500; color: var(--ink-soft);
+  background: transparent; border: 0; border-bottom: 3px solid transparent;
+  padding: .55rem .9rem .5rem; margin-bottom: -1px; cursor: pointer;
+}
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--gilt); font-weight: 700; }
+.chal-intro { margin: 1.25rem 0 0; }
+.chal-list { margin-left: 2.4rem; }
+.book-how { display: block; margin-top: .1rem; font-size: .9rem; color: var(--ink-soft); line-height: 1.4; }
+[hidden] { display: none !important; }
+
+/* Footer */
+.foot { padding: 2.75rem 0 3.5rem 2.4rem; color: var(--ink-soft); font-size: .875rem; }
+.foot p { margin: 0 0 1rem; max-width: 33rem; }
+.clear { color: var(--ink-soft); padding: .45rem .85rem; }
+.clear.is-armed { color: var(--crimson); border-color: var(--crimson); }
+.clear:disabled { opacity: .5; cursor: default; }
+
+@media (max-width: 30rem) {
+  .masthead { padding-top: 2rem; }
+  .bracket-head h2 { font-size: 1.4375rem; }
+  .watch { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+<header class="wrap masthead">
+  <h1>Alliance book route</h1>
+  <p class="lede">All 40 books in the order you’ll level through their zones. Tick each one as you collect it.</p>
+  <p class="sync" id="sync" role="status" aria-live="polite"></p>
+</header>
+
+<div class="wrap"><div class="tabs" role="tablist" aria-label="Sections">
+  <button type="button" class="tab" role="tab" id="tab-books" data-tab="books" aria-controls="panel-books" aria-selected="true">Book route</button>
+  <button type="button" class="tab" role="tab" id="tab-chal" data-tab="chal" aria-controls="panel-chal" aria-selected="false">Legacy challenges</button>
+</div></div>
+
+<div id="panel-books" role="tabpanel" aria-labelledby="tab-books">
+<div class="toolbar" id="toolbar">
+  <div class="wrap toolbar-inner">
+    <div class="tally">
+      <p class="tally-text" id="tally"><strong>0</strong> of 40 collected</p>
+      <div class="bar" aria-hidden="true"><span id="bar-fill"></span></div>
+    </div>
+    <button type="button" class="hide-toggle" id="hide" aria-pressed="false">Hide collected</button>
+    <nav class="jumps" id="jumps" aria-label="Jump to a level bracket"></nav>
+  </div>
+</div>
+
+<main class="wrap">
+  <ol class="route" id="route"></ol>
+  <footer class="foot">
+    <p>Level ranges are the standard Classic zone ranges. Videos open on YouTube in a new tab.</p>
+    <button type="button" class="clear" id="clear">Clear all ticks</button>
+  </footer>
+</main>
+</div>
+
+<div id="panel-chal" role="tabpanel" aria-labelledby="tab-chal" hidden>
+<div class="wrap"><p class="lede chal-intro">All 65 WoW Forever Legacy challenges, easiest first. Each is worth one account-wide Legacy point. The difficulty order is my own estimate, not Blizzard’s.</p></div>
+<div class="toolbar" id="toolbar2">
+  <div class="wrap toolbar-inner">
+    <div class="tally">
+      <p class="tally-text" id="tally2"><strong>0</strong> of 65 done</p>
+      <div class="bar" aria-hidden="true"><span id="bar-fill2"></span></div>
+    </div>
+    <button type="button" class="hide-toggle" id="hide2" aria-pressed="false">Hide done</button>
+    <nav class="jumps" id="jumps2" aria-label="Jump to a difficulty tier"></nav>
+  </div>
+</div>
+<main class="wrap">
+  <ol class="route" id="route2"></ol>
+  <footer class="foot">
+    <p>Class challenges go to the first character of each class to reach level 25, 45 and 60, so each class needs its own character. Profession challenges cover the six non-gathering professions. Point totals unlock Legacy rewards (15, 25, 40 and 55 points at launch). Challenges earned outside Hardcore don’t count in Hardcore.</p>
+    <button type="button" class="clear" id="clear2">Clear all ticks</button>
+  </footer>
+</main>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // [zone, levels, flag, [[key, title, note, videoId], ...]]
+  const ROUTE = [
+    { id: "levels-1-20", title: "Levels 1–20", short: "1–20",
+      tip: "Grab the Ironforge book whenever you pass through the city.",
+      zones: [
+        ["Elwynn Forest", "1–10", "", [["n25", "Archmage Theocritus’ Research Journal", "Solo", "pAHm3wDztbg"]]],
+        ["Westfall", "10–20", "", [["n39", "Bewitchments and Glamours", "Solo", "nF3pQ-cnNqE"]]],
+        ["Ironforge", "City", "", [["n27", "Archmage Antonidas: The Unabridged Autobiography", "Depends, easy for Alliance", "_B5KQQgkRHQ"]]],
+        ["Loch Modan", "10–20", "", [
+          ["n28", "Rumi of Gnomeregan: The Collected Works", "Solo", "ZBRr4qB15Q0"],
+          ["n29", "Runes of the Sorcerer-Kings", "Solo", "EcgpvlozbC4"]]],
+        ["Darkshore", "10–20", "", [["n2", "Nar’thalas Almanac, Vol. 74", "Solo", "t2CopdCqGS0"]]]
+      ] },
+    { id: "levels-20-30", title: "Levels 20–30", short: "20–30",
+      tip: "Silverpine and the Barrens are Horde zones, so watch for guards and players. Southshore is the easy way into Silverpine, and Ratchet is a safe base for the Barrens.",
+      zones: [
+        ["Duskwood", "18–30", "", [["n21", "Crimes Against Anatomy", "Solo", "dDFrwuU4zC0"]]],
+        ["Wetlands", "20–30", "", [["n40", "Goaz Scrolls", "Solo", "gDS5gIPS3H0"]]],
+        ["Silverpine Forest", "10–20", "Horde zone", [
+          ["n31", "Ataeric: On Arcane Curiosities", "Solo", "s7a1RhCVQcM"],
+          ["n32", "The Dalaran Digest, Vol. 23", "Solo", "OSozBPebS10"]]],
+        ["Stonetalon Mountains", "15–27", "", [["n8", "Fury of the Land", "Solo", "eptlLkub7_o"]]],
+        ["The Barrens", "10–25", "Horde zone", [
+          ["n10", "Arcanic Systems Manual", "Solo", "sN-gWUvC6gw"],
+          ["n11", "Baxtan: On Destructive Magics", "Solo", "P-sIolLKJeQ"],
+          ["n12", "Secrets of the Dreamers", "Solo", "23wLhtWJWME"]]],
+        ["Thousand Needles", "25–35", "", [["n13", "Geomancy: The Stone-Cold Truth", "Group, Level 28", "r7_0z5cT-Jo"]]]
+      ] },
+    { id: "levels-30-40", title: "Levels 30–40", short: "30–40", tip: "",
+      zones: [
+        ["Arathi Highlands", "30–40", "", [["n16", "A Web of Lies: Debunking Myths and Legends", "Depends", "i78DSSwzLLA"]]],
+        ["Alterac Mountains", "30–40", "", [["n15", "Defensive Magics 101", "Solo", "iJEHZKxUUQ8"]]],
+        ["Stranglethorn Vale", "30–45", "", [["n33", "Basilisks: Should Petrification be Feared?", "Group or pet", "vVTv-03raEI"]]],
+        ["Swamp of Sorrows", "35–45", "", [
+          ["n34", "A Luddite’s Guide to Caring for Your Demonic Pet", "Group", "vQgybiMDe-0"],
+          ["n35", "Sanguine Sorcery", "Solo", "Ky-x5KMPSCw"]]],
+        ["Badlands", "35–45", "", [["n17", "Mummies: A Guide to the Unsavory Undead", "Solo", "TxDYgD84Khg"]]],
+        ["Desolace", "30–40", "", [["n3", "Demons and You", "Group", "kNMUJdQyQAc"]]],
+        ["Dustwallow Marsh", "35–45", "", [["n4", "RwlRwlRwlRwl!", "Group", "mHoM6u6cbc4"]]]
+      ] },
+    { id: "levels-40-50", title: "Levels 40–50", short: "40–50", tip: "",
+      zones: [
+        ["The Hinterlands", "40–50", "", [["n26", "Venomous Journeys", "Solo", "px9LdMrETNY"]]],
+        ["Searing Gorge", "43–50", "", [["n30", "A Mind of Metal", "Group, hard", "0LAtrgLWHxw"]]],
+        ["Blasted Lands", "45–55", "", [["n18", "Conjurer’s Codex", "Solo, wait", "VVcHTC6u4JY"]]],
+        ["Feralas", "40–50", "", [["n6", "The Liminal and the Arcane", "Missing", "reF3hqSufkA"]]],
+        ["Tanaris", "40–50", "", [["n9", "Legends of the Tidesages", "Group, hard", "4DITEOSo5y4"]]],
+        ["Azshara", "45–55", "", [["n1", "Everyday Etiquette", "Solo", "iQcxbirQ3Z8"]]],
+        ["Felwood", "48–55", "", [["n5", "Northern Kalimdor - A Comprehensive Guide", "Solo, hard", "wgZX2v191xs"]]]
+      ] },
+    { id: "levels-50-60", title: "Levels 50–60", short: "50–60",
+      tip: "Both Burning Steppes books are in the same video.",
+      zones: [
+        ["Burning Steppes", "50–58", "", [
+          ["n19", "Stonewrought Design", "Solo", "Vq0HHIgwNWA"],
+          ["n20", "Magma or Lava?", "Solo", "Vq0HHIgwNWA"]]],
+        ["Western Plaguelands", "51–58", "", [
+          ["n37", "Necromancy 101", "Solo", "QouKycYe4Ko"],
+          ["n38", "Undead Potatoes", "Solo", "OGPmxfqI-Ks"]]],
+        ["Eastern Plaguelands", "53–60", "", [
+          ["n22", "A Study of the Light", "Solo", "d78vJaPDWs4"],
+          ["n23", "Scourge: Undead Menace or Misunderstood?", "Solo", "maAlmldIWSE"],
+          ["n24", "The Knight and the Lady", "Solo", "2hmd94roiV4"]]],
+        ["Winterspring", "55–60", "", [["n14", "Ka-Boom!", "Solo, hard, long run", "QQJU9gIB_R4"]]]
+      ] },
+    { id: "horde-territory", title: "Horde territory", short: "Horde",
+      tip: "Tirisfal is just north of Silverpine, so add it to that trip if the spot isn’t near guards. Orgrimmar means sneaking into the Horde capital, so watch the video first.",
+      zones: [
+        ["Tirisfal Glades", "1–10", "Horde zone", [["n36", "The Apothecary’s Metaphysical Primer", "Depends, easy for Horde", "A9gz8S_vAbU"]]],
+        ["Orgrimmar", "City", "Horde capital", [["n7", "The Lessons of Ta’zo", "Solo", "rTCUu8ctHPM"]]]
+      ] }
+  ];
+
+  const LS_DONE = "alliance-book-route:done";
+  const LS_HIDE = "alliance-book-route:hide";
+  const CK_DONE = "abr_done", CK_HIDE = "abr_hide", CK_TAB = "abr_tab";
+  const PLAY_SVG = '<svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 1.6v8.8L10.4 6z"/></svg>';
+
+  const KEYS = new Set();
+  const state = { done: new Set(), hide: false, hideC: false, tab: "books" };
+  const pinned = new Set(); // ticked while "Hide collected" is on: stay visible until the toggle is used again
+  const model = [];
+
+  const $ = (id) => document.getElementById(id);
+  const routeEl = $("route"), jumpsEl = $("jumps"), tallyEl = $("tally"), barFill = $("bar-fill");
+  const hideBtn = $("hide"), clearBtn = $("clear"), syncEl = $("sync"), toolbar = $("toolbar");
+
+  function h(tag, attrs, ...kids) {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (v === null || v === undefined || v === false || v === "") continue;
+      if (k === "class") el.className = v; else el.setAttribute(k, v);
+    }
+    for (const kid of kids) if (kid !== null && kid !== undefined) el.append(kid);
+    return el;
+  }
+
+  function tagsFor(note) {
+    return note.split(/,\s*/).filter(Boolean).map((t) => {
+      const low = t.toLowerCase();
+      let kind = "info";
+      if (low === "solo") kind = "solo";
+      else if (low.startsWith("group")) kind = "group";
+      else if (low === "hard" || low === "long run") kind = "hard";
+      else if (low === "missing") kind = "missing";
+      return { label: t.charAt(0).toUpperCase() + t.slice(1), kind };
+    });
+  }
+
+  // ---------- Saving: cookies first, localStorage as backup ----------
+  const COOKIE_OK = (() => {
+    try {
+      document.cookie = "abr_t=1; path=/; SameSite=Lax";
+      const ok = document.cookie.indexOf("abr_t=1") !== -1;
+      document.cookie = "abr_t=; path=/; max-age=0";
+      return ok;
+    } catch (e) { return false; }
+  })();
+  const LOCAL_OK = (() => {
+    try { localStorage.setItem("abr:test", "1"); localStorage.removeItem("abr:test"); return true; }
+    catch (e) { return false; }
+  })();
+  const SAVE_OK = COOKIE_OK || LOCAL_OK;
+  function setCookie(name, val) {
+    if (!COOKIE_OK) return;
+    try {
+      document.cookie = name + "=" + encodeURIComponent(val) + "; path=/; max-age=31536000; SameSite=Lax" + (location.protocol === "https:" ? "; Secure" : "");
+    } catch (e) {}
+  }
+  function getCookie(name) {
+    if (!COOKIE_OK) return null;
+    try {
+      const m = document.cookie.split("; ").find((c) => c.startsWith(name + "="));
+      return m ? decodeURIComponent(m.slice(name.length + 1)) : null;
+    } catch (e) { return null; }
+  }
+  function lsSet(k, v) { if (LOCAL_OK) { try { localStorage.setItem(k, v); } catch (e) {} } }
+  function lsGet(k) { if (!LOCAL_OK) return null; try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  function saveLocal() {
+    const list = Array.from(state.done);
+    setCookie(CK_DONE, list.join("."));
+    lsSet(LS_DONE, JSON.stringify(list));
+  }
+  function saveHide() {
+    const v = (state.hide ? "1" : "0") + (state.hideC ? "1" : "0");
+    setCookie(CK_HIDE, v);
+    lsSet(LS_HIDE, v);
+  }
+  function saveTab() { setCookie(CK_TAB, state.tab); lsSet("alliance-book-route:tab", state.tab); }
+  function loadLocal() {
+    let list = null;
+    const c = getCookie(CK_DONE);
+    if (c !== null) list = c.split(".").filter(Boolean);
+    else {
+      try { const arr = JSON.parse(lsGet(LS_DONE) || "null"); if (Array.isArray(arr)) list = arr; } catch (e) {}
+    }
+    (list || []).forEach((k) => { if (KEYS.has(k)) state.done.add(k); });
+    const hv = getCookie(CK_HIDE) || lsGet(LS_HIDE) || "";
+    state.hide = hv[0] === "1";
+    state.hideC = hv[1] === "1";
+    const t = getCookie(CK_TAB) || lsGet("alliance-book-route:tab");
+    if (t === "chal") state.tab = "chal";
+  }
+
+  // ---------- Build ----------
+  function build() {
+    ROUTE.forEach((br) => {
+      const count = h("span", { class: "bracket-count" });
+      const heading = h("h2", {}, br.title);
+      const li = h("li", { class: "bracket", id: br.id },
+        h("div", { class: "bracket-head" }, h("span", { class: "ribbon", "aria-hidden": "true" }), heading, count),
+        br.tip ? h("p", { class: "tip" }, br.tip) : null);
+      const zonesEl = h("ol", { class: "zones" });
+      const bm = { li, count, heading, zones: [], total: 0 };
+
+      br.zones.forEach(([name, lv, flag, books]) => {
+        const node = h("span", { class: "node", "aria-hidden": "true" });
+        const sr = h("span", { class: "sr" });
+        const zli = h("li", { class: "zone" }, node,
+          h("h3", { class: "zone-head" },
+            h("span", { class: "zone-name" }, name),
+            h("span", { class: "zone-lv" }, lv),
+            flag ? h("span", { class: "zone-flag" }, flag) : null,
+            sr),
+          h("p", { class: "zone-note" }, "All collected"));
+        const ul = h("ul", { class: "books" });
+        const zm = { li: zli, node, sr, books: [] };
+
+        books.forEach(([key, title, note, vid]) => {
+          KEYS.add(key);
+          const tid = "t-" + key, mid = "m-" + key;
+          const input = h("input", { type: "checkbox", class: "tick", "aria-labelledby": tid, "aria-describedby": mid });
+          const tags = h("span", { class: "tags", id: mid });
+          tagsFor(note).forEach((t) => tags.append(h("span", { class: "tag tag-" + t.kind }, t.label)));
+          const link = h("a", {
+            class: "watch",
+            href: "https://youtu.be/" + vid,
+            target: "_blank",
+            rel: "noopener noreferrer",
+            "aria-label": "Watch video: " + title + " (YouTube)"
+          });
+          link.innerHTML = PLAY_SVG;
+          link.append("Watch video");
+          link.addEventListener("click", (e) => e.stopPropagation());
+          const row = h("label", { class: "book" }, input,
+            h("span", { class: "book-body" },
+              h("span", { class: "book-title", id: tid }, title),
+              h("span", { class: "book-meta" }, tags, link)));
+          const bli = h("li", {}, row);
+          input.addEventListener("change", () => onToggle(key, input.checked));
+          ul.append(bli);
+          zm.books.push({ key, li: bli, row, input });
+        });
+
+        zli.append(ul);
+        zonesEl.append(zli);
+        bm.zones.push(zm);
+        bm.total += books.length;
+      });
+
+      li.append(zonesEl);
+      routeEl.append(li);
+
+      const jc = h("span", { class: "jc" });
+      const jump = h("button", { type: "button", class: "jump" }, h("span", {}, br.short), jc);
+      jump.addEventListener("click", () => jumpTo(br.id));
+      jumpsEl.append(jump);
+      bm.jump = jump;
+      bm.jc = jc;
+      model.push(bm);
+    });
+  }
+
+  // ---------- Legacy challenges ----------
+  const CLASSES = ["Druid", "Hunter", "Mage", "Paladin", "Priest", "Rogue", "Shaman", "Warlock", "Warrior"];
+  const PROFS = [["Alchemy", "Alchemist"], ["Blacksmithing", "Blacksmith"], ["Enchanting", "Enchanter"], ["Engineering", "Engineer"], ["Leatherworking", "Leatherworker"], ["Tailoring", "Tailor"]];
+  const TIERS = [
+    ["Very easy", "Just level a character of each class to 25."],
+    ["Easy", "Early level 45 class milestones, first profession rank and the first dungeons."],
+    ["Moderate", "Level 60, mid-level professions, the second dungeon set, Onyxia and the Valthalak questline."],
+    ["Hard", "Long profession and reputation grinds, the final dungeon set, exploration and the bigger raid."],
+    ["Very hard", "Hyjal Summit and the top Honor ranks, which take the longest."]
+  ];
+  // [title, how, category, tier]
+  const CH = [];
+  ["Novice", "Experienced", "Master"].forEach((n, i) => CLASSES.forEach((c) =>
+    CH.push([n + " " + c, "First " + c + " to reach level " + [25, 45, 60][i], "Class", [1, 2, 3][i]])));
+  ["Journeyman", "Expert", "Artisan"].forEach((n, i) => PROFS.forEach(([p, t]) =>
+    CH.push([n + " " + t, p + " skill " + [150, 225, 300][i], "Tradeskill", [2, 3, 4][i]])));
+  [["Rank 3", "Reach Sergeant in the Honor System", 2], ["Rank 7", "Reach Knight-Lieutenant or Blood Guard", 4],
+   ["Rank 10", "Reach Lieutenant-Commander or Champion", 5], ["Rank 13", "Reach Field Marshal or Warlord", 5],
+   ["Rank 14", "Reach Grand Marshal or High Warlord", 5],
+   ["Master of Alterac Valley", "Exalted with Frostwolf Clan or Stormpike Guard", 4],
+   ["Master of Arathi Basin", "Exalted with the Defilers or League of Arathor", 4],
+   ["Master of Darkspear Islands", "Exalted with Darkspear Raiders or Theramore Expeditionary Force", 4],
+   ["Master of Warsong Gulch", "Exalted with Warsong Outriders or Silverwing Sentinels", 4],
+   ["Field of Honor: Week 4", "Complete week 4 of the Field of Honor Journey", 3],
+   ["Field of Honor: Week 7", "Complete week 7 of the Field of Honor Journey", 4],
+   ["Field of Honor: Week 10", "Complete week 10 of the Field of Honor Journey", 4]
+  ].forEach(([t, d, n]) => CH.push([t, d, "PvP", n]));
+  CH.push(["Novice Spelunker", "Defeat the final boss of every level 15–25 dungeon", "Dungeon", 2]);
+  CH.push(["Experienced Spelunker", "Defeat the final boss of every level 26–45 dungeon", "Dungeon", 3]);
+  CH.push(["Master Spelunker", "Defeat the final boss of every level 46–60 dungeon", "Dungeon", 4]);
+  CH.push(["Conqueror of the Lair", "Defeat Onyxia", "Raid", 3]);
+  CH.push(["Conqueror of the Deeps", "Defeat all 8 bosses in Barrow Deeps", "Raid", 4]);
+  CH.push(["Conqueror of the Wilds", "Defeat all 13 bosses in Hyjal Summit", "Raid", 5]);
+  CH.push(["Explorer", "Explore the entire world map on one character", "Adventure", 4]);
+  CH.push(["Lord Valthalak Laid to Rest", "Finish the quests from An Earnest Proposition to Saving the Best for Last", "Adventure", 3]);
+
+  const cmodel = [];
+  const cRoute = $("route2"), cJumps = $("jumps2"), cTally = $("tally2"), cFill = $("bar-fill2");
+  const cHide = $("hide2"), cClear = $("clear2"), toolbar2 = $("toolbar2");
+
+  function buildC() {
+    const groups = TIERS.map(() => []);
+    CH.forEach((c, i) => groups[c[3] - 1].push({ key: "c" + (i + 1), title: c[0], how: c[1], cat: c[2] }));
+    groups.forEach((items, ti) => {
+      const id = "tier-" + (ti + 1);
+      const count = h("span", { class: "bracket-count" });
+      const ul = h("ul", { class: "books chal-list" });
+      const li = h("li", { class: "bracket", id },
+        h("div", { class: "bracket-head" }, h("span", { class: "ribbon", "aria-hidden": "true" }), h("h2", {}, TIERS[ti][0]), count),
+        h("p", { class: "tip" }, TIERS[ti][1]), ul);
+      const g = { li, count, items: [] };
+      items.forEach((it) => {
+        KEYS.add(it.key);
+        const tid = "t-" + it.key;
+        const input = h("input", { type: "checkbox", class: "tick", "aria-labelledby": tid });
+        const row = h("label", { class: "book" }, input,
+          h("span", { class: "book-body" },
+            h("span", { class: "book-title", id: tid }, it.title),
+            h("span", { class: "book-how" }, it.how),
+            h("span", { class: "book-meta" }, h("span", { class: "tags" }, h("span", { class: "tag tag-group" }, it.cat)))));
+        const bli = h("li", {}, row);
+        input.addEventListener("change", () => onToggle(it.key, input.checked));
+        ul.append(bli);
+        g.items.push({ key: it.key, li: bli, row, input });
+      });
+      cRoute.append(li);
+      const jc = h("span", { class: "jc" });
+      const jump = h("button", { type: "button", class: "jump" }, h("span", {}, TIERS[ti][0]), jc);
+      jump.addEventListener("click", () => jumpTo(id));
+      cJumps.append(jump);
+      g.jump = jump; g.jc = jc;
+      cmodel.push(g);
+    });
+  }
+
+  function refreshC() {
+    let total = 0;
+    for (const g of cmodel) {
+      let d = 0;
+      for (const it of g.items) {
+        const on = state.done.has(it.key);
+        it.input.checked = on;
+        it.row.classList.toggle("is-done", on);
+        it.li.hidden = state.hideC && on && !pinned.has(it.key);
+        if (on) d++;
+      }
+      const n = g.items.length, full = d === n;
+      g.count.textContent = full ? "All " + n + " done" : d + " of " + n;
+      g.li.classList.toggle("is-done", full);
+      g.jc.textContent = d + "/" + n;
+      g.jump.classList.toggle("is-done", full);
+      total += d;
+    }
+    cTally.textContent = "";
+    if (total === CH.length) cTally.append("All " + total + " challenges done");
+    else cTally.append(h("strong", {}, String(total)), " of " + CH.length + " done");
+    cFill.style.width = (total / CH.length * 100) + "%";
+    cHide.setAttribute("aria-pressed", state.hideC ? "true" : "false");
+    cClear.disabled = total === 0 && !cClear.classList.contains("is-armed");
+  }
+
+  // ---------- Render ----------
+  function refresh() {
+    let total = 0;
+    for (const bm of model) {
+      let bDone = 0;
+      for (const zm of bm.zones) {
+        let zDone = 0, zVisible = 0;
+        for (const b of zm.books) {
+          const on = state.done.has(b.key);
+          b.input.checked = on;
+          b.row.classList.toggle("is-done", on);
+          const hidden = state.hide && on && !pinned.has(b.key);
+          b.li.hidden = hidden;
+          if (!hidden) zVisible++;
+          if (on) zDone++;
+        }
+        const n = zm.books.length;
+        zm.node.style.setProperty("--p", String(zDone / n));
+        zm.li.classList.toggle("has-some", zDone > 0);
+        zm.li.classList.toggle("is-done", zDone === n);
+        zm.li.classList.toggle("is-collapsed", state.hide && zVisible === 0);
+        zm.sr.textContent = zDone + " of " + n + " collected";
+        bDone += zDone;
+      }
+      const complete = bDone === bm.total;
+      bm.count.textContent = complete ? "All " + bm.total + " collected" : bDone + " of " + bm.total;
+      bm.li.classList.toggle("is-done", complete);
+      bm.jc.textContent = bDone + "/" + bm.total;
+      bm.jump.classList.toggle("is-done", complete);
+      total += bDone;
+    }
+    const all = model.reduce((a, m) => a + m.total, 0);
+    tallyEl.textContent = "";
+    if (total === all) {
+      tallyEl.append("All " + all + " books collected");
+    } else {
+      tallyEl.append(h("strong", {}, String(total)), " of " + all + " collected");
+    }
+    barFill.style.width = (total / all * 100) + "%";
+    hideBtn.setAttribute("aria-pressed", state.hide ? "true" : "false");
+    clearBtn.disabled = total === 0 && !clearBtn.classList.contains("is-armed");
+    refreshC();
+  }
+
+  // ---------- Interactions ----------
+  function onToggle(key, on) {
+    if (on) state.done.add(key); else state.done.delete(key);
+    if ((key[0] === "c" ? state.hideC : state.hide) && on) pinned.add(key);
+    if (syncing) preOps.push({ key, on });
+    saveLocal();
+    scheduleWrite();
+    refresh();
+  }
+
+  hideBtn.addEventListener("click", () => {
+    state.hide = !state.hide;
+    pinned.clear();
+    saveHide();
+    refresh();
+  });
+  cHide.addEventListener("click", () => {
+    state.hideC = !state.hideC;
+    pinned.clear();
+    saveHide();
+    refresh();
+  });
+
+  function wireClear(btn, prefix) {
+    let t = null;
+    const disarm = () => {
+      clearTimeout(t);
+      btn.classList.remove("is-armed");
+      btn.textContent = "Clear all ticks";
+      refresh();
+    };
+    btn.addEventListener("click", () => {
+      if (!btn.classList.contains("is-armed")) {
+        btn.classList.add("is-armed");
+        btn.textContent = "Press again to clear all ticks";
+        t = setTimeout(disarm, 4000);
+        return;
+      }
+      for (const k of Array.from(state.done)) if (k[0] === prefix) { state.done.delete(k); pinned.delete(k); }
+      if (syncing) preOps.push({ clear: prefix });
+      saveLocal();
+      scheduleWrite(0);
+      disarm();
+    });
+  }
+  wireClear(clearBtn, "n");
+  wireClear(cClear, "c");
+
+  // ---------- Tabs ----------
+  function showTab(name) {
+    state.tab = name;
+    $("panel-books").hidden = name !== "books";
+    $("panel-chal").hidden = name !== "chal";
+    document.querySelectorAll(".tab").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === name ? "true" : "false"));
+    setToolbarVar();
+  }
+  document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => { showTab(b.dataset.tab); saveTab(); }));
+
+  function jumpTo(id) {
+    const target = document.getElementById(id);
+    if (!target) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    const heading = target.querySelector("h2");
+    if (heading) { heading.setAttribute("tabindex", "-1"); heading.focus({ preventScroll: true }); }
+  }
+
+  function setToolbarVar() {
+    document.documentElement.style.setProperty("--toolbar-h", (state.tab === "chal" ? toolbar2 : toolbar).offsetHeight + "px");
+  }
+
+  // ---------- Status ----------
+  const STATUS = {
+    local: SAVE_OK ? "Progress is saved in this browser with cookies." : "Progress lasts only while this page is open.",
+    connecting: "Loading your saved ticks…",
+    synced: "Ticks are saved to your account.",
+    slow: "Can’t reach your saved ticks yet. New ticks are kept in this browser for now.",
+    fallback: SAVE_OK
+      ? "Saving to your account isn’t available here, so progress is saved in this browser with cookies."
+      : "Saving isn’t available here, so progress lasts only while this page is open."
+  };
+  let statusMode = "";
+  function setStatus(mode) {
+    statusMode = mode;
+    syncEl.dataset.mode = mode;
+    syncEl.textContent = STATUS[mode] || "";
+  }
+
+  // ---------- Account sync (each viewer's own progress) ----------
+  let remote = null, unsub = null, dirty = false, writing = false, writeTimer = null;
+  let syncing = false;
+  const preOps = [];
+
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej({ code: "timeout" }), ms))]);
+
+  function bodyNow() { return { collected: Array.from(state.done) }; }
+
+  function scheduleWrite(delay = 600) {
+    if (!remote) return;
+    dirty = true;
+    clearTimeout(writeTimer);
+    writeTimer = setTimeout(flush, delay);
+  }
+
+  async function flush() {
+    if (!remote || writing || !dirty) return;
+    writing = true;
+    dirty = false;
+    let err = null;
+    try { await remote.set(bodyNow()); }
+    catch (e) {
+      err = e;
+      if (e && e.code === "unavailable") {
+        await sleep(400 + Math.random() * 800);
+        try { if (remote) { await remote.set(bodyNow()); err = null; } } catch (e2) { err = e2; }
+      }
+    }
+    writing = false;
+    if (err) { goLocal("fallback"); return; }
+    if (dirty) flush();
+  }
+
+  function goLocal(mode) {
+    remote = null;
+    dirty = false;
+    clearTimeout(writeTimer);
+    if (unsub) { try { unsub(); } catch (e) {} unsub = null; }
+    setStatus(mode);
+  }
+
+  function applyRemote(data) {
+    const arr = data && Array.isArray(data.collected) ? data.collected : [];
+    state.done = new Set(arr.filter((k) => KEYS.has(k)));
+    saveLocal();
+    refresh();
+  }
+
+  function replay(ops) {
+    for (const op of ops) {
+      if (op.clear) { for (const k of Array.from(state.done)) if (k[0] === op.clear) state.done.delete(k); }
+      else if (op.on) state.done.add(op.key);
+      else state.done.delete(op.key);
+    }
+  }
+
+  async function initSync() {
+    const c = window.claude;
+    if (!c || typeof c.use !== "function") { setStatus("local"); return; }
+    syncing = true;
+    setStatus("connecting");
+    const stop = (mode) => { syncing = false; preOps.length = 0; setStatus(mode); };
+
+    let db = null, user = null;
+    try { [db, user] = await Promise.all([c.use("db"), c.use("user")]); } catch (e) { db = null; }
+    if (!db || !user) return stop("local");
+
+    let uid = null, canWrite = null;
+    try { uid = await user.id(); canWrite = await user.can("data.write"); } catch (e) {}
+    if (!uid || canWrite === false) return stop("local");
+
+    let ref;
+    try { ref = db.doc("data/users/" + uid + "/progress"); } catch (e) { return stop("local"); }
+
+    let first = null, failure = null;
+    for (let attempt = 0; attempt < 2 && !first; attempt++) {
+      try { first = await withTimeout(ref.get(), 10000); failure = null; }
+      catch (e) {
+        failure = e;
+        if (!(e && e.code === "unavailable")) break;
+        await sleep(400 + Math.random() * 600);
+      }
+    }
+    if (!first && failure && failure.code !== "timeout") return stop("fallback");
+
+    remote = ref;
+    syncing = false;
+    if (first) {
+      if (first.exists) {
+        const data = first.data();
+        const arr = data && Array.isArray(data.collected) ? data.collected : [];
+        state.done = new Set(arr.filter((k) => KEYS.has(k)));
+        if (preOps.length) { replay(preOps); dirty = true; }
+      } else if (state.done.size) {
+        dirty = true; // first save: move this browser's ticks to the account
+      }
+      preOps.length = 0;
+      saveLocal();
+      refresh();
+      setStatus("synced");
+      if (dirty) flush();
+    } else {
+      preOps.length = 0;
+      setStatus("slow");
+    }
+
+    unsub = ref.onSnapshot((snap) => {
+      if (!remote) return;
+      if (snap.exists && !dirty && !writing) applyRemote(snap.data());
+      if (!snap.metadata.fromCache && statusMode !== "synced") setStatus("synced");
+    }, () => goLocal("fallback"));
+  }
+
+  // ---------- Start ----------
+  build();
+  buildC();
+  loadLocal();
+  showTab(state.tab);
+  refresh();
+  setToolbarVar();
+  if (typeof ResizeObserver === "function") { const ro = new ResizeObserver(setToolbarVar); ro.observe(toolbar); ro.observe(toolbar2); }
+  else window.addEventListener("resize", setToolbarVar);
+  setStatus(window.claude && typeof window.claude.use === "function" ? "connecting" : "local");
+  initSync();
+})();
+</script>
+</body>
+</html>
