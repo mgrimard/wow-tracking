@@ -400,7 +400,7 @@ body::before {
 </div>
 
 <div id="panel-chal" role="tabpanel" aria-labelledby="tab-chal" hidden>
-<div class="wrap"><p class="lede chal-intro">All 65 WoW Forever Legacy challenges, easiest first. Each is worth one account-wide Legacy point. The difficulty order is my own estimate, not Blizzard’s.</p></div>
+<div class="wrap"><p class="lede chal-intro">All 65 WoW Forever Legacy challenges, grouped by type. Each is worth one account-wide Legacy point. Within each group, the easier ones come first.</p></div>
 <div class="toolbar" id="toolbar2">
   <div class="wrap toolbar-inner">
     <div class="tally">
@@ -408,7 +408,7 @@ body::before {
       <div class="bar" aria-hidden="true"><span id="bar-fill2"></span></div>
     </div>
     <button type="button" class="hide-toggle" id="hide2" aria-pressed="false">Hide done</button>
-    <nav class="jumps" id="jumps2" aria-label="Jump to a difficulty tier"></nav>
+    <nav class="jumps" id="jumps2" aria-label="Jump to a challenge type"></nav>
   </div>
 </div>
 <main class="wrap">
@@ -661,12 +661,14 @@ body::before {
   // ---------- Legacy challenges ----------
   const CLASSES = ["Druid", "Hunter", "Mage", "Paladin", "Priest", "Rogue", "Shaman", "Warlock", "Warrior"];
   const PROFS = [["Alchemy", "Alchemist"], ["Blacksmithing", "Blacksmith"], ["Enchanting", "Enchanter"], ["Engineering", "Engineer"], ["Leatherworking", "Leatherworker"], ["Tailoring", "Tailor"]];
+  // [category key, heading, tip]
   const TIERS = [
-    ["Very easy", "Just level a character of each class to 25."],
-    ["Easy", "Early level 45 class milestones, first profession rank and the first dungeons."],
-    ["Moderate", "Level 60, mid-level professions, the second dungeon set, Onyxia and the Valthalak questline."],
-    ["Hard", "Long profession and reputation grinds, the final dungeon set, exploration and the bigger raid."],
-    ["Very hard", "Hyjal Summit and the top Honor ranks, which take the longest."]
+    ["Class", "Leveling", "Levels 25, 45 and 60 on the first character of each class (27 points)."],
+    ["Tradeskill", "Professions", "Skill 150, 225 and 300 in the six non-gathering professions (18 points)."],
+    ["PvP", "PvP", "Honor ranks, battleground reputation and Field of Honor weeks (12 points)."],
+    ["Dungeon", "Dungeons", "Defeat every final boss in each level range (3 points)."],
+    ["Raid", "Raids", "Onyxia, Barrow Deeps and Hyjal Summit (3 points)."],
+    ["Adventure", "Exploration", "Explore the whole map and finish the Valthalak questline (2 points)."]
   ];
   // [title, how, category, tier]
   const CH = [];
@@ -700,14 +702,15 @@ body::before {
 
   function buildC() {
     const groups = TIERS.map(() => []);
-    CH.forEach((c, i) => groups[c[3] - 1].push({ key: "c" + (i + 1), title: c[0], how: c[1], cat: c[2] }));
+    CH.forEach((c, i) => groups[TIERS.findIndex((t) => t[0] === c[2])].push({ key: "c" + (i + 1), title: c[0], how: c[1], cat: c[2], tier: c[3] }));
+    groups.forEach((g) => g.sort((a, b) => a.tier - b.tier));
     groups.forEach((items, ti) => {
-      const id = "tier-" + (ti + 1);
+      const id = "cat-" + (ti + 1);
       const count = h("span", { class: "bracket-count" });
       const ul = h("ul", { class: "books chal-list" });
       const li = h("li", { class: "bracket", id },
-        h("div", { class: "bracket-head" }, h("span", { class: "ribbon", "aria-hidden": "true" }), h("h2", {}, TIERS[ti][0]), count),
-        h("p", { class: "tip" }, TIERS[ti][1]), ul);
+        h("div", { class: "bracket-head" }, h("span", { class: "ribbon", "aria-hidden": "true" }), h("h2", {}, TIERS[ti][1]), count),
+        h("p", { class: "tip" }, TIERS[ti][2]), ul);
       const g = { li, count, items: [] };
       items.forEach((it) => {
         KEYS.add(it.key);
@@ -717,7 +720,7 @@ body::before {
           h("span", { class: "book-body" },
             h("span", { class: "book-title", id: tid }, it.title),
             h("span", { class: "book-how" }, it.how),
-            h("span", { class: "book-meta" }, h("span", { class: "tags" }, h("span", { class: "tag tag-group" }, it.cat)))));
+            null));
         const bli = h("li", {}, row);
         input.addEventListener("change", () => onToggle(it.key, input.checked));
         ul.append(bli);
@@ -725,7 +728,7 @@ body::before {
       });
       cRoute.append(li);
       const jc = h("span", { class: "jc" });
-      const jump = h("button", { type: "button", class: "jump" }, h("span", {}, TIERS[ti][0]), jc);
+      const jump = h("button", { type: "button", class: "jump" }, h("span", {}, TIERS[ti][1]), jc);
       jump.addEventListener("click", () => jumpTo(id));
       cJumps.append(jump);
       g.jump = jump; g.jc = jc;
