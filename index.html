@@ -347,6 +347,8 @@ body::before {
 .chal-intro { margin: 1.25rem 0 0; }
 .chal-list { margin-left: 2.4rem; }
 .book-how { display: block; margin-top: .1rem; font-size: .9rem; color: var(--ink-soft); line-height: 1.4; }
+.book-loc { display: block; margin-top: .1rem; font-size: .9rem; color: var(--ink-soft); line-height: 1.4; }
+.book-loc strong { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
 [hidden] { display: none !important; }
 
 /* Footer */
@@ -393,7 +395,7 @@ body::before {
 <main class="wrap">
   <ol class="route" id="route"></ol>
   <footer class="foot">
-    <p>Level ranges are the standard Classic zone ranges. Videos open on YouTube in a new tab.</p>
+    <p>Level ranges are the standard Classic zone ranges. Coordinates are map positions (x, y) from the Warcraft Wiki’s library book list, using the Forever map for Eastern Plaguelands. Videos open on YouTube in a new tab.</p>
     <button type="button" class="clear" id="clear">Clear all ticks</button>
   </footer>
 </main>
@@ -500,6 +502,35 @@ body::before {
   const LS_DONE = "alliance-book-route:done";
   const LS_HIDE = "alliance-book-route:hide";
   const CK_DONE = "abr_done", CK_HIDE = "abr_hide", CK_TAB = "abr_tab";
+  // key: [place, "x, y" map coordinates or null]
+  const LOC = {
+    n25: ["Tower of Azora, 3rd floor", "65.4, 70.1"], n39: ["Moonbrook", "45.4, 70.5"],
+    n27: ["Hall of Explorers", "75.7, 10.5"], n28: ["Thelsamar", "35.6, 48.9"],
+    n29: ["Mo’grosh Stronghold", "77.5, 14.1"], n2: ["Ruins of Mathystra", "59.6, 22.2"],
+    n21: ["Dawning Wood Catacombs", "16.7, 28.5"], n40: ["Whelgar’s Excavation Site", "33.6, 47.9"],
+    n31: ["The Sepulcher", "43.4, 41.2"], n32: ["Amber Mill", "63.5, 63.1"],
+    n8: ["Camp Aparaje", "74.4, 85.7"], n10: ["Sludge Fen", "56.3, 8.8"],
+    n11: ["Ratchet", "62.7, 36.3"], n12: ["Outside Wailing Caverns", "49.3, 33.5"],
+    n13: ["Darkcloud Pinnacle", "34.4, 40.1"], n16: ["Witherbark Village", "73.6, 65.2"],
+    n15: ["Ruins of Alterac", "48.5, 57.6"], n33: ["", "41.4, 50.9"],
+    n34: ["Fallow Sanctuary", "61.5, 22.6"], n35: ["Outside the Temple of Atal’Hakkar", "70.1, 51.8"],
+    n17: ["", "56.7, 39.9"], n3: ["Thunder Axe Fortress", "55.1, 26.2"],
+    n4: ["Witch Hill", "57.2, 20.8"], n26: ["Shadra’Alor", "36.0, 72.8"],
+    n30: ["", "37.8, 49.3"], n18: ["", "55.3, 32.2"],
+    n6: ["Jademir Lake", "50.6, 15.7"], n9: ["Lost Rigger Cove", "72.6, 47.8"],
+    n1: ["Haldarr Encampment", "20.8, 62.0"], n5: ["Timbermaw Hold", "65.2, 3.2"],
+    n19: ["Blackrock Mountain, Forgewright’s Tomb (no map coordinates listed)", null],
+    n20: ["Blackrock Mountain, Grinding Quarry (no map coordinates listed)", null],
+    n37: ["Caer Darrow", "69.4, 72.8"], n38: ["Felstone Field", "38.3, 54.6"],
+    n22: ["Light’s Hope Chapel", "71.8, 48.2"], n23: ["Outside Stratholme", "26.6, 14.9"],
+    n24: ["Blackwood Lake", "47.3, 42.2"], n14: ["Everlook", "60.7, 37.7"],
+    n36: ["Brill", "59.5, 52.3"], n7: ["Valley of Spirits", "38.7, 78.4"]
+  };
+  function locLine(key) {
+    const l = LOC[key];
+    if (!l) return null;
+    return h("span", { class: "book-loc" }, l[0] + (l[0] && l[1] ? " · " : ""), l[1] ? h("strong", {}, l[1]) : null);
+  }
   const PLAY_SVG = '<svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 1.6v8.8L10.4 6z"/></svg>';
 
   const KEYS = new Set();
@@ -632,6 +663,7 @@ body::before {
           const row = h("label", { class: "book" }, input,
             h("span", { class: "book-body" },
               h("span", { class: "book-title", id: tid }, title),
+              locLine(key),
               h("span", { class: "book-meta" }, tags, link)));
           const bli = h("li", {}, row);
           input.addEventListener("change", () => onToggle(key, input.checked));
